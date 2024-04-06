@@ -46,7 +46,7 @@ export class MsEdgeTTS {
   private static BINARY_DELIM = "Path:audio\r\n";
   private static VOICE_LANG_REGEX = /\w{2}-\w{2}/;
   private readonly _enableLogger;
-  private readonly _isBrowser: boolean;
+  //private readonly _isBrowser: boolean;
   private _ws: WebSocket;
   private _voice: string;
   private _voiceLocale: string;
@@ -54,7 +54,7 @@ export class MsEdgeTTS {
 
   private _streams: { [key: string]: Readable } = {};
   private _startTime = 0;
-  private readonly _agent: Agent;
+  //private readonly _agent: Agent;
 
   private _log(...o: any[]) {
     if (this._enableLogger) {
@@ -69,15 +69,15 @@ export class MsEdgeTTS {
    * @param enableLogger=false whether to enable the built-in logger. This logs connections inits, disconnects, and incoming data to the console
    */
   public constructor(agent?: Agent, enableLogger: boolean = false) {
-    this._agent = agent;
+    //this._agent = agent;
     this._enableLogger = enableLogger;
-    this._isBrowser =
-      typeof window !== "undefined" && typeof window.document !== "undefined";
+    // this._isBrowser =
+    //   typeof window !== "undefined" && typeof window.document !== "undefined";
   }
 
-  private async _send(message) {
+  private async _send(message: string): Promise<void> {
     for (let i = 1; i <= 3 && this._ws.readyState !== this._ws.OPEN; i++) {
-      if (i == 1) {
+      if (i === 1) {
         this._startTime = Date.now();
       }
       this._log("connecting: ", i);
