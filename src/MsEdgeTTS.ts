@@ -1,6 +1,5 @@
 import { WebSocket } from "@libsql/isomorphic-ws";
 import { Buffer } from "buffer";
-import { randomBytes } from "crypto";
 import { OUTPUT_FORMAT } from "./OUTPUT_FORMAT";
 import { Readable } from "stream";
 import { Agent } from "http";
@@ -49,9 +48,10 @@ export class MsEdgeTTS {
   private readonly _enableLogger;
   private readonly _isBrowser: boolean;
   private _ws: WebSocket;
-  private _voice;
-  private _voiceLocale;
-  private _outputFormat;
+  private _voice: string;
+  private _voiceLocale: string;
+  private _outputFormat: OUTPUT_FORMAT;
+
   private _streams: { [key: string]: Readable } = {};
   private _startTime = 0;
   private readonly _agent: Agent;
@@ -268,6 +268,14 @@ export class MsEdgeTTS {
     const { stream } = this._rawSSMLRequest(requestSSML);
     return stream;
   }
+  private _randomValues(length: number): string {
+    const buffer = new Uint8Array(length);
+    const randomValues = crypto.getRandomValues(buffer);
+    const hexString = [...new Uint8Array(randomValues)]
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return hexString;
+  }
 
   private _rawSSMLRequest(requestSSML: string): {
     stream: Readable;
@@ -275,7 +283,7 @@ export class MsEdgeTTS {
   } {
     this._metadataCheck();
 
-    const requestId = randomBytes(16).toString("hex");
+    const requestId = this._randomValues(16);
     const request =
       `X-RequestId:${requestId}\r\nContent-Type:application/ssml+xml\r\nPath:ssml\r\n\r\n
                 ` + requestSSML.trim();
