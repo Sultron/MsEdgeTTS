@@ -1,7 +1,7 @@
 import { WebSocket } from "@libsql/isomorphic-ws";
 import { Buffer } from "buffer";
 import { OUTPUT_FORMAT } from "./OUTPUT_FORMAT";
-import { Readable } from "stream";
+import { Readable } from "node:stream";
 import { Agent } from "http";
 import { PITCH } from "./PITCH";
 import { RATE } from "./RATE";
