@@ -90,9 +90,9 @@ export class MsEdgeTTS {
   }
 
   private _initClient() {
-    this._ws = this._isBrowser
-      ? new WebSocket(MsEdgeTTS.SYNTH_URL)
-      : new WebSocket(MsEdgeTTS.SYNTH_URL, { agent: this._agent });
+    this._ws = new WebSocket(MsEdgeTTS.SYNTH_URL);
+    // ? new WebSocket(MsEdgeTTS.SYNTH_URL)
+    // : new WebSocket(MsEdgeTTS.SYNTH_URL, { agent: this._agent });
 
     this._ws.binaryType = "arraybuffer";
     return new Promise((resolve, reject) => {
