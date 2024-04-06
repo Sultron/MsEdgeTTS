@@ -3,7 +3,6 @@ import { Buffer } from "buffer";
 import { randomBytes } from "crypto";
 import { OUTPUT_FORMAT } from "./OUTPUT_FORMAT";
 import { Readable } from "stream";
-import * as fs from "fs";
 import { Agent } from "http";
 import { PITCH } from "./PITCH";
 import { RATE } from "./RATE";
@@ -248,22 +247,6 @@ export class MsEdgeTTS {
   }
 
   /**
-   * Writes raw audio synthesised from text to a file. Uses a basic {@link _SSMLTemplate SML template}.
-   *
-   * @param path a valid output path, including a filename and file extension.
-   * @param input the input to synthesise
-   * @param options (optional) {@link ProsodyOptions}
-   * @returns {Promise<string>} - a `Promise` with the full filepath
-   */
-  toFile(
-    path: string,
-    input: string,
-    options?: ProsodyOptions
-  ): Promise<string> {
-    return this._rawSSMLRequestToFile(path, this._SSMLTemplate(input, options));
-  }
-
-  /**
    * Writes raw audio synthesised from text in real-time to a {@link Readable}. Uses a basic {@link _SSMLTemplate SML template}.
    *
    * @param input the text to synthesise. Can include SSML elements.
@@ -276,17 +259,6 @@ export class MsEdgeTTS {
   }
 
   /**
-   * Writes raw audio synthesised from text to a file. Has no SSML template. Basic SSML should be provided in the request.
-   *
-   * @param path a valid output path, including a filename and file extension.
-   * @param requestSSML the SSML to send. SSML elements required in order to work.
-   * @returns {Promise<string>} - a `Promise` with the full filepath
-   */
-  rawToFile(path: string, requestSSML: string): Promise<string> {
-    return this._rawSSMLRequestToFile(path, requestSSML);
-  }
-
-  /**
    * Writes raw audio synthesised from a request in real-time to a {@link Readable}. Has no SSML template. Basic SSML should be provided in the request.
    *
    * @param requestSSML the SSML to send. SSML elements required in order to work.
@@ -295,31 +267,6 @@ export class MsEdgeTTS {
   rawToStream(requestSSML: string): Readable {
     const { stream } = this._rawSSMLRequest(requestSSML);
     return stream;
-  }
-
-  private _rawSSMLRequestToFile(
-    path: string,
-    requestSSML: string
-  ): Promise<string> {
-    return new Promise(async (resolve, reject) => {
-      const { stream, requestId } = this._rawSSMLRequest(requestSSML);
-
-      const writableFile = stream.pipe(fs.createWriteStream(path));
-
-      writableFile.once("close", async () => {
-        if (writableFile.bytesWritten > 0) {
-          resolve(path);
-        } else {
-          fs.unlinkSync(path);
-          reject("No audio data received");
-        }
-      });
-
-      stream.on("error", (e) => {
-        stream.destroy();
-        reject(e);
-      });
-    });
   }
 
   private _rawSSMLRequest(requestSSML: string): {
